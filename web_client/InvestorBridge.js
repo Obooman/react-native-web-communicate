@@ -4,14 +4,19 @@
 	var RJBridge = {};
 	var tagMessage = "RJMessage::";
 	var methods = {
-		navigator:'navigator::',
-		popUp:'popUp::'
+		navigate:'navigate::',
+		popUp:'popUp::',
+		toast:'toast::'
 	}
 
-	function changeHash( targetString ){
+	function changeHash( method ,content ){
 		var hash = window.location.hash;
-		window.location.hash = targetString;
-		// window.location.hash = hash;
+		var parseString = tagMessage + 
+						  methods[ method ] + 
+						  JSON.stringify( content );
+
+		window.location.hash = parseString;
+		window.location.hash = hash;
 	}
 
 	function generateCommunicateString( method, params ){
@@ -27,19 +32,27 @@
 
 		configParams.content = content;
 
-		alert(1)
-
 		changeHash( 'popUp', JSON.stringify(configParams) );
 	}
 
-	RJBridge.navigator = function( targetRoute, params ){
-		params.keys(function( key ) {
-			targetRoute[ key ] = params[ key ]
-		})
+	RJBridge.navigate = function( targetRoute, params ){
+		var route = {};
+		route.targetRoute = targetRoute;
 
-		changeHash( 'navigator', targetRoute );
+		if( params ){
+
+			params.keys( function( key ){
+				route[ key ] = params[ key ]
+			})
+		}
+
+		changeHash( 'navigate', { route:route } );
+	}
+
+	RJBridge.toast = function( message ){
+		changeHash( 'toast', { message:message } );
 	}
 
 	window.RJMessage = RJBridge;
 
-})( window )
+}( window ))
